@@ -1135,6 +1135,10 @@ hgt:167cm eyr:2026
 """
 
 
+import re
+
+
+RE_D = re.compile(r'^#(?:[0-9a-fA-F]{3}){1,2}$')
 
 
 def passport_validation(value):
@@ -1152,5 +1156,87 @@ def passport_validation(value):
     return len(new_list)
 
 
+def check_byr(value):
+    if value and len(value) == 4 and (1920 <= int(value) <= 2002):
+        return True
+    else:
+        return False
+
+def check_iyr(value):
+    if value and len(value) == 4 and (2010 <= int(value) <= 2020):
+        return True
+    else:
+        return False
+
+def check_eyr(value):
+    if value and len(value) == 4 and (2020 <= int(value) <= 2030):
+        return True
+    else:
+        return False
+
+def check_hgt(value):
+    if value and 'cm' in value:
+        if 150<=int(value.replace('cm',''))<=193:
+            return True
+    elif value and 'in' in value:
+        if 59<=int(value.replace('in',''))<=76:
+            return True
+    else:
+        return False
+
+def check_hcl(value):
+    if value and RE_D.search(value):
+        return True
+    else:
+        return False
+
+def check_ecl(value):
+    if value and value in ['amb','blu','brn','gry','grn','hzl','oth']:
+        return True
+    else:
+        return False
+
+def check_pid(value):
+    if value and len(value) == 9:
+        return True
+    else:
+        return False
+
+def passport_validation_p2(value):
+    keys = ["byr","iyr","eyr","hgt","hcl","ecl","pid","cid"]
+    new_list = []
+    if value and isinstance(value, str):
+        for i in value.split('\n\n'):
+            new_temp = dict()
+            for j in i.replace('\n',' ').strip().split(' '):
+                key = j.split(':')[0]
+                value = j.split(':')[1]
+                if key == 'byr':
+                    if check_byr(value):
+                        new_temp[key] = value
+                if key == 'iyr':
+                    if check_iyr(value):
+                        new_temp[key] = value
+                if key == 'eyr':
+                    if check_eyr(value):
+                        new_temp[key] = value
+                if key == 'hgt':
+                    if check_hgt(value):
+                        new_temp[key] = value
+                if key == 'hcl':
+                    if check_hcl(value):
+                        new_temp[key] = value
+                if key == 'ecl':
+                    if check_ecl(value):
+                        new_temp[key] = value
+                if key == 'pid':
+                    if check_pid(value):
+                        new_temp[key] = value
+            
+            if all(name in  new_temp for name in [x for x in keys if not x == 'cid']):
+                new_list.append(new_temp)
+    return len(new_list)
+
 print(passport_validation(input_map))
+print(passport_validation_p2(input_map))
 
